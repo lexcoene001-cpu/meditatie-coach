@@ -97,6 +97,28 @@ Start altijd met: "Hoe was het om te zitten?"`;
   }
 });
 
+app.post('/coach', async (req, res) => {
+  const { berichten } = req.body;
+
+  const systeem = `Je bent een deskundige en warme meditatie-coach.
+Je beantwoordt vragen over meditatie, mindfulness en de oefenpraktijk.
+Je geeft praktische, eerlijke antwoorden zonder te zweverig te zijn.
+Maximaal 3-4 zinnen per antwoord.`;
+
+  try {
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 400,
+      system: systeem,
+      messages: berichten,
+    });
+    res.json({ bericht: response.content[0].text });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ fout: 'Kon geen reactie genereren' });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Coach server draait op poort ${PORT}`);
