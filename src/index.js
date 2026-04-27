@@ -108,12 +108,30 @@ Stijl:
 });
 
 app.post('/coach', async (req, res) => {
-  const { berichten } = req.body;
+  const { berichten, context = {} } = req.body;
+
+  let contextTekst = '';
+  if (context && Object.keys(context).length > 0) {
+    const regels = [];
+    if (context.streak > 0) regels.push(`Streak: ${context.streak} dagen op rij`);
+    if (context.totaalSessies > 0) regels.push(`Totaal meditaties: ${context.totaalSessies} (${context.totaalMinuten} minuten)`);
+    if (context.meestGedaan) regels.push(`Meest beoefend: ${context.meestGedaan}`);
+    if (context.heeftProgramma) {
+      regels.push(`Volgt het 28-daags programma: dag ${context.programmaDag}, fase ${context.programmaFase}`);
+      if (context.meditatieVandaagGedaan) regels.push(`Meditatie vandaag: gedaan`);
+      else regels.push(`Meditatie vandaag: nog niet gedaan`);
+      if (context.tussendoorVandaagGedaan) regels.push(`Tussendoor vandaag: gedaan`);
+      else regels.push(`Tussendoor vandaag: nog niet gedaan`);
+    } else {
+      regels.push(`Volgt geen programma`);
+    }
+    contextTekst = `\n\nGebruikerscontext (gebruik dit subtiel — noem het niet letterlijk tenzij relevant):\n${regels.join('\n')}`;
+  }
 
   const systeem = `Je bent een deskundige en warme meditatie-coach.
 Je beantwoordt vragen over meditatie, mindfulness en de oefenpraktijk.
 Je geeft praktische, eerlijke antwoorden zonder te zweverig te zijn.
-Maximaal 3-4 zinnen per antwoord.`;
+Maximaal 3-4 zinnen per antwoord.${contextTekst}`;
 
   try {
     const response = await client.messages.create({
