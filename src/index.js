@@ -204,7 +204,7 @@ app.get('/privacy', (req, res) => {
   <p class="sub">ZIT — Minder app, Meer meditatie<br>Laatst bijgewerkt: april 2026</p>
 
   <h2>1. Wie zijn wij</h2>
-  <p>ZIT is een meditatie-app ontwikkeld door Lex Coene. Voor vragen over privacy kun je contact opnemen via <a href="mailto:lexcoene001@gmail.com">lexcoene001@gmail.com</a>.</p>
+  <p>ZIT is een meditatie-app ontwikkeld door Lex Coene. Voor vragen over privacy kun je contact opnemen via <a href="mailto:verlichting2010@gmail.com">verlichting2010@gmail.com</a>.</p>
 
   <h2>2. Welke gegevens verzamelen we</h2>
   <ul>
@@ -223,7 +223,7 @@ app.get('/privacy', (req, res) => {
   </ul>
 
   <h2>4. Hoe lang bewaren we je gegevens</h2>
-  <p>Je gegevens worden bewaard zolang je account actief is. Je kunt op elk moment je account en alle bijbehorende gegevens laten verwijderen via <a href="mailto:lexcoene001@gmail.com">lexcoene001@gmail.com</a>.</p>
+  <p>Je gegevens worden bewaard zolang je account actief is. Je kunt op elk moment je account en alle bijbehorende gegevens laten verwijderen via <a href="mailto:verlichting2010@gmail.com">verlichting2010@gmail.com</a>.</p>
 
   <h2>5. Delen met derden</h2>
   <p>We delen je gegevens niet met derden, behalve:</p>
@@ -236,7 +236,7 @@ app.get('/privacy', (req, res) => {
   <p>De coach in ZIT is een AI, aangedreven door Claude van Anthropic. De coach is geen vervanging voor professionele psychologische of medische hulp. Berichten die je naar de coach stuurt worden verwerkt door de Anthropic API en niet door ons opgeslagen.</p>
 
   <h2>7. Jouw rechten</h2>
-  <p>Op grond van de AVG heb je het recht op inzage, correctie en verwijdering van je gegevens. Stuur een e-mail naar <a href="mailto:lexcoene001@gmail.com">lexcoene001@gmail.com</a> en we reageren binnen 30 dagen.</p>
+  <p>Op grond van de AVG heb je het recht op inzage, correctie en verwijdering van je gegevens. Stuur een e-mail naar <a href="mailto:verlichting2010@gmail.com">verlichting2010@gmail.com</a> en we reageren binnen 30 dagen.</p>
 
   <h2>8. Beveiliging</h2>
   <p>Je gegevens worden opgeslagen bij Supabase met versleutelde verbindingen (HTTPS) en row-level security. Alleen jij hebt toegang tot jouw gegevens.</p>
@@ -245,7 +245,7 @@ app.get('/privacy', (req, res) => {
   <p>We kunnen deze privacyverklaring aanpassen. Bij belangrijke wijzigingen word je via de app geïnformeerd.</p>
 
   <h2>10. Contact</h2>
-  <p>Vragen? Mail naar <a href="mailto:lexcoene001@gmail.com">lexcoene001@gmail.com</a>.</p>
+  <p>Vragen? Mail naar <a href="mailto:verlichting2010@gmail.com">verlichting2010@gmail.com</a>.</p>
 </body>
 </html>`);
 });
