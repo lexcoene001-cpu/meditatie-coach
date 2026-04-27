@@ -121,6 +121,59 @@ Maximaal 3-4 zinnen per antwoord.`;
   }
 });
 
+app.post('/programma', async (req, res) => {
+  const { berichten = [] } = req.body;
+
+  const systeem = `Je bent een warme begeleider die een beginner helpt starten met mediteren via een 28-daags programma.
+
+Het programma ziet er zo uit:
+- Week 1: Lichaam (5 min per dag)
+- Week 2: Adem (10 min per dag)
+- Week 3: Gedachten (15 min per dag)
+- Week 4: Stilte (20 min per dag)
+Elke week heeft 6 actieve dagen en 1 rustdag.
+Elke actieve dag: 1 meditatie + 1 mindful moment tussendoor (bijv. aandachtig afwassen, wandelen).
+Achtergrondgeluiden zijn optioneel.
+
+Hoe je het gesprek voert:
+1. Begin met een warme begroeting en vraag wat hen naar meditatie brengt (1 vraag)
+2. Reageer kort op hun antwoord, stel eventueel 1 vervolgvraag over beschikbare tijd of verwachtingen
+3. Leg het programma kort uit (2-3 zinnen, niet alle details)
+4. Vraag of ze willen starten
+
+Wanneer de gebruiker bevestigt dat ze willen starten (ja, graag, prima, doe maar, etc.):
+- Eindig je bericht met de exacte tekst: [PROGRAMMA_START]
+- Geef daarvoor een korte, bemoedigende afsluiting
+
+Stijl:
+- Warm, kort, menselijk — geen jargon
+- Maximaal 3-4 zinnen per bericht
+- Één vraag per bericht`;
+
+  try {
+    const messages = berichten.map((b) => ({
+      role: b.rol === 'coach' ? 'assistant' : 'user',
+      content: b.tekst,
+    }));
+
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 400,
+      system: systeem,
+      messages: messages.length > 0 ? messages : [{ role: 'user', content: 'start' }],
+    });
+
+    const tekst = response.content[0].text;
+    const programmaBevestigd = tekst.includes('[PROGRAMMA_START]');
+    const schooneTekst = tekst.replace('[PROGRAMMA_START]', '').trim();
+
+    res.json({ bericht: schooneTekst, programma_bevestigd: programmaBevestigd });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ fout: 'Er ging iets mis.' });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Coach server draait op poort ${PORT}`);
