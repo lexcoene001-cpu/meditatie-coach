@@ -182,6 +182,74 @@ Stijl:
   }
 });
 
+app.get('/privacy', (req, res) => {
+  res.send(`<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacyverklaring — ZIT</title>
+  <style>
+    body { font-family: -apple-system, sans-serif; max-width: 680px; margin: 0 auto; padding: 40px 24px; color: #1a1a1a; line-height: 1.7; }
+    h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+    h2 { font-size: 18px; font-weight: 600; margin-top: 40px; margin-bottom: 8px; }
+    p, li { font-size: 16px; color: #333; }
+    ul { padding-left: 20px; }
+    a { color: #1D9E75; }
+    .sub { color: #888; font-size: 14px; margin-bottom: 40px; }
+  </style>
+</head>
+<body>
+  <h1>Privacyverklaring</h1>
+  <p class="sub">ZIT — Minder app, Meer meditatie<br>Laatst bijgewerkt: april 2026</p>
+
+  <h2>1. Wie zijn wij</h2>
+  <p>ZIT is een meditatie-app ontwikkeld door Lex Coene. Voor vragen over privacy kun je contact opnemen via <a href="mailto:lexcoene001@gmail.com">lexcoene001@gmail.com</a>.</p>
+
+  <h2>2. Welke gegevens verzamelen we</h2>
+  <ul>
+    <li><strong>E-mailadres</strong> — voor inloggen via een eenmalige code (OTP). Er is geen wachtwoord.</li>
+    <li><strong>Meditatiesessies</strong> — type, duur en datum van je meditaties en tussendoor-momenten.</li>
+    <li><strong>Profiel</strong> — of je ervaring hebt met mediteren en de startdatum van je programma.</li>
+    <li><strong>Feedback</strong> — tekst die je zelf invult via het feedbackformulier.</li>
+  </ul>
+  <p>We verzamelen geen locatiegegevens, betaalgegevens of apparaatinformatie.</p>
+
+  <h2>3. Waarom verzamelen we deze gegevens</h2>
+  <ul>
+    <li>Om je te kunnen laten inloggen en je voortgang bij te houden.</li>
+    <li>Om je streak, sessiegeschiedenis en programmavoortgang te tonen.</li>
+    <li>Om de app te verbeteren op basis van feedback.</li>
+  </ul>
+
+  <h2>4. Hoe lang bewaren we je gegevens</h2>
+  <p>Je gegevens worden bewaard zolang je account actief is. Je kunt op elk moment je account en alle bijbehorende gegevens laten verwijderen via <a href="mailto:lexcoene001@gmail.com">lexcoene001@gmail.com</a>.</p>
+
+  <h2>5. Delen met derden</h2>
+  <p>We delen je gegevens niet met derden, behalve:</p>
+  <ul>
+    <li><strong>Supabase</strong> — onze database- en authenticatieprovider, servers in de EU (AVG-conform).</li>
+    <li><strong>Anthropic</strong> — de AI-coach verwerkt berichten via de Anthropic API. Gesprekken worden niet opgeslagen na de sessie.</li>
+  </ul>
+
+  <h2>6. AI-coach</h2>
+  <p>De coach in ZIT is een AI, aangedreven door Claude van Anthropic. De coach is geen vervanging voor professionele psychologische of medische hulp. Berichten die je naar de coach stuurt worden verwerkt door de Anthropic API en niet door ons opgeslagen.</p>
+
+  <h2>7. Jouw rechten</h2>
+  <p>Op grond van de AVG heb je het recht op inzage, correctie en verwijdering van je gegevens. Stuur een e-mail naar <a href="mailto:lexcoene001@gmail.com">lexcoene001@gmail.com</a> en we reageren binnen 30 dagen.</p>
+
+  <h2>8. Beveiliging</h2>
+  <p>Je gegevens worden opgeslagen bij Supabase met versleutelde verbindingen (HTTPS) en row-level security. Alleen jij hebt toegang tot jouw gegevens.</p>
+
+  <h2>9. Wijzigingen</h2>
+  <p>We kunnen deze privacyverklaring aanpassen. Bij belangrijke wijzigingen word je via de app geïnformeerd.</p>
+
+  <h2>10. Contact</h2>
+  <p>Vragen? Mail naar <a href="mailto:lexcoene001@gmail.com">lexcoene001@gmail.com</a>.</p>
+</body>
+</html>`);
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Coach server draait op poort ${PORT}`);
