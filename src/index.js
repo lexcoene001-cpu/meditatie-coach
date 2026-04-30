@@ -62,7 +62,18 @@ Geef ALLEEN een JSON terug, geen extra tekst, geen markdown, geen backticks:
 });
 
 app.post('/inquiry', async (req, res) => {
-  const { berichten = [], tijd, type, gestopt = false, gedaanMinuten } = req.body;
+  const { berichten = [], tijd, type, gestopt = false, gedaanMinuten, programmaDag, programmaFase } = req.body;
+
+  const FASE_CONTEXT = {
+    lichaam:    'Week 1 — kennismaking en grondleggen. De gebruiker begint net.',
+    adem:       'Week 2 — verdieping. De basis is gelegd, nu verder.',
+    gedachten:  'Week 3 — vaak de zwaarste week. Volhouden is hier de oefening.',
+    stilte:     'Week 4 — integratie en afronding. De gebruiker is bijna klaar met het programma.',
+  };
+
+  const programmaContext = (programmaDag && programmaFase)
+    ? `\n\nProgrammacontext (gebruik spaarzaam — alleen waar het natuurlijk past bij wat de gebruiker zegt, nooit geforceerd):\nDag ${programmaDag} van 28 — ${FASE_CONTEXT[programmaFase] || programmaFase}`
+    : '';
 
   const systeem = `Je bent een warme, menselijke mindfulness-coach die na een meditatie met iemand in gesprek gaat. De toon is die van een goede vriend met ervaring — niet klinisch, niet zweverig, gewoon aanwezig.
 
@@ -92,7 +103,7 @@ Stijl:
 - Geen analyses of interpretaties — reageer op wat er letterlijk gezegd wordt
 - Geen jargon, vermijd "ik hoor je zeggen dat..."
 - Mag eerlijk zijn over moeilijke ervaringen ("Ja, dat kan zwaar zijn")
-- Geen overdreven complimenten of geforceerde positiviteit`;
+- Geen overdreven complimenten of geforceerde positiviteit${programmaContext}`;
 
   try {
     let startBericht;

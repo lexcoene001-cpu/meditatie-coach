@@ -128,7 +128,7 @@ const PROFIELEN = {
 
 // ─── API-aanroep ─────────────────────────────────────────────────────────────
 
-async function roepInquiryAan(dag, fase, duur, gebruikerInput, gesprekHistorie) {
+async function roepInquiryAan(dag, fase, duur, gebruikerInput, gesprekHistorie, programmaDag) {
   const starttijd = Date.now();
 
   // Bouw berichten op: één ronde gebruiker→coach
@@ -142,6 +142,8 @@ async function roepInquiryAan(dag, fase, duur, gebruikerInput, gesprekHistorie) 
     tijd: duur,
     type: fase,
     gestopt: false,
+    programmaDag: programmaDag || dag,
+    programmaFase: fase,
   });
 
   const response = await fetch(`${API_URL}/inquiry`, {
@@ -191,7 +193,7 @@ async function simuleerProfiel(profiel) {
 
     try {
       const { coachBericht, responstijd, promptTokens, totaalTekens } = await roepInquiryAan(
-        dag, fase, duur, gebruikerInput, gesprekHistorie
+        dag, fase, duur, gebruikerInput, gesprekHistorie, dag
       );
 
       // Voeg toe aan cumulatieve historie (max laatste 6 uitwisselingen bewaren)
@@ -218,19 +220,29 @@ async function simuleerProfiel(profiel) {
 
 // ─── Analyse ─────────────────────────────────────────────────────────────────
 
-function analyseer(resultaten, profiel) {
+function analyseer(resultaten) {
   const actief = resultaten.filter(r => r.coachBericht);
 
-  // Verwijst coach naar eerdere dagen?
+  // Verwijst coach naar eerdere dagen (algemeen)?
   const verwijzingen = actief.filter(r =>
     /eerder|vorige|gisteren|week \d|dag \d|de laatste|net als|je zei|je noemde/i.test(r.coachBericht)
   );
 
-  // Inconsistenties of herhalingen (zelfde zin >1x)
+  // Verwijst coach naar fase/dag context (nieuw)?
+  const faseVerwijzingen = actief.filter(r =>
+    /week [1-4]|dag \d+ van|bijna klaar|laatste week|zwaarste|grondleg|verdiep|integrat|kennismak/i.test(r.coachBericht)
+  );
+
+  // Geforceerde verwijzingen (context expliciet vermeld terwijl niet gevraagd)?
+  const geforceerd = actief.filter(r =>
+    /je zit nu in week|dit is dag|programmadag|je bent nu in fase/i.test(r.coachBericht)
+  );
+
+  // Herhalingen
   const zinnen = actief.flatMap(r => r.coachBericht.split(/[.!?]/).map(s => s.trim().toLowerCase()).filter(s => s.length > 20));
   const dubbelen = zinnen.filter((z, i) => zinnen.indexOf(z) !== i);
 
-  // Toonverschil vroeg vs laat (simpel: aantal woorden)
+  // Toonverschil vroeg vs laat
   const vroeg = actief.filter(r => r.dag <= 7);
   const laat = actief.filter(r => r.dag >= 22);
   const gemWoorden = (arr) => arr.length
@@ -245,7 +257,7 @@ function analyseer(resultaten, profiel) {
   // Promptgroei
   const promptGroei = actief.map(r => ({ dag: r.dag, tekens: r.totaalTekens }));
 
-  return { verwijzingen, dubbelen, vroeg, laat, gemWoorden, gemTijd, maxTijd, promptGroei };
+  return { verwijzingen, faseVerwijzingen, geforceerd, dubbelen, vroeg, laat, gemWoorden, gemTijd, maxTijd, promptGroei };
 }
 
 // ─── Rapport genereren ────────────────────────────────────────────────────────
@@ -275,20 +287,32 @@ function genereeerRapport(profiel, resultaten) {
   regels.push(`| Max responstijd | ${analyse.maxTijd}ms |`);
   regels.push(`| Gem. woorden coach (week 1) | ${analyse.gemWoorden(analyse.vroeg)} |`);
   regels.push(`| Gem. woorden coach (week 4) | ${analyse.gemWoorden(analyse.laat)} |`);
+  regels.push(`| Fase/dag-verwijzingen | ${analyse.faseVerwijzingen.length} |`);
+  regels.push(`| Geforceerde verwijzingen | ${analyse.geforceerd.length} |`);
   regels.push('');
 
   // Analyse
   regels.push('## Analyse');
   regels.push('');
-  regels.push('### Verwijst de coach naar eerdere dagen?');
-  if (analyse.verwijzingen.length > 0) {
-    regels.push(`Ja — ${analyse.verwijzingen.length}x gevonden:`);
-    analyse.verwijzingen.forEach(r => {
-      regels.push(`- **Dag ${r.dag}:** "${r.coachBericht.slice(0, 120)}..."`);
+  regels.push('### Verwijst de coach naar fase of dag?');
+  if (analyse.faseVerwijzingen.length > 0) {
+    regels.push(`Ja — ${analyse.faseVerwijzingen.length}x gevonden:`);
+    analyse.faseVerwijzingen.forEach(r => {
+      regels.push(`- **Dag ${r.dag} [${r.fase}]:** "${r.coachBericht.slice(0, 140)}..."`);
     });
   } else {
-    regels.push('Nee — geen expliciete verwijzingen naar eerdere dagen gevonden.');
-    regels.push('> ⚠️ De coach onthoudt de context niet over sessies heen. Elke dag start met een schone lei.');
+    regels.push('Nee — geen verwijzingen naar fase of dag gevonden.');
+  }
+  regels.push('');
+
+  regels.push('### Geforceerde/te expliciete verwijzingen?');
+  if (analyse.geforceerd.length > 0) {
+    regels.push(`⚠️ ${analyse.geforceerd.length}x te expliciet:`);
+    analyse.geforceerd.forEach(r => {
+      regels.push(`- **Dag ${r.dag}:** "${r.coachBericht.slice(0, 140)}"`);
+    });
+  } else {
+    regels.push('Geen geforceerde verwijzingen gevonden. ✅');
   }
   regels.push('');
 
@@ -301,7 +325,7 @@ function genereeerRapport(profiel, resultaten) {
       ? '→ Coach wordt uitgebreider naarmate het programma vordert.'
       : '→ Coach wordt beknopter naarmate het programma vordert.');
   } else {
-    regels.push('→ Woordlengte blijft consistent — toon past zich niet meetbaar aan.');
+    regels.push('→ Woordlengte blijft consistent.');
   }
   regels.push('');
 
