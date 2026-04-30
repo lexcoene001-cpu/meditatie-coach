@@ -1,2 +1,14 @@
 .env
 node_modules
+
+# macOS
+.DS_Store
+
+# logs
+*.log
+
+# Word lock-files
+~$*.docx
+
+# audio bronnen (te groot voor git, beheerd via iCloud Drive)
+audio/
