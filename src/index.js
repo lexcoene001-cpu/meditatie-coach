@@ -253,7 +253,7 @@ app.get('/privacy', (req, res) => {
   <p class="sub">ZIT — Minder app, Meer meditatie<br>Laatst bijgewerkt: april 2026</p>
 
   <h2>1. Wie zijn wij</h2>
-  <p>ZIT is een meditatie-app ontwikkeld door Lex Coene. Voor vragen over privacy kun je contact opnemen via <a href="mailto:verlichting2010@gmail.com">verlichting2010@gmail.com</a>.</p>
+  <p>ZIT is een meditatie-app. Voor vragen over privacy kun je contact opnemen via <a href="mailto:lexcoene001@gmail.com">lexcoene001@gmail.com</a>.</p>
 
   <h2>2. Welke gegevens verzamelen we</h2>
   <ul>
