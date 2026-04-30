@@ -62,7 +62,7 @@ Geef ALLEEN een JSON terug, geen extra tekst, geen markdown, geen backticks:
 });
 
 app.post('/inquiry', async (req, res) => {
-  const { berichten, tijd, type, gestopt = false, gedaanMinuten } = req.body;
+  const { berichten = [], tijd, type, gestopt = false, gedaanMinuten } = req.body;
 
   const systeem = `Je bent een warme, menselijke mindfulness-coach die na een meditatie met iemand in gesprek gaat. De toon is die van een goede vriend met ervaring — niet klinisch, niet zweverig, gewoon aanwezig.
 
