@@ -161,7 +161,10 @@ Je kent de ZIT-app van binnen en van buiten en kunt vragen over de app beantwoor
 app.post('/programma', async (req, res) => {
   const { berichten = [] } = req.body;
 
+  const vandaag = new Date().toISOString().split('T')[0];
+
   const systeem = `Je bent een warme begeleider die iemand helpt starten met een 28-daags meditatieprogramma.
+Vandaag is het ${vandaag}.
 
 Het programma:
 - Week 1: Lichaam (5 min per dag)
@@ -169,17 +172,18 @@ Het programma:
 - Week 3: Gedachten (15 min per dag)
 - Week 4: Stilte (20 min per dag)
 Elke week: 6 actieve dagen + 1 rustdag.
-Elke actieve dag: 1 meditatie + 1 mindful moment tussendoor (bijv. aandachtig afwassen, wandelen).
+Elke actieve dag: 1 meditatie + 1 mindful moment tussendoor.
 
-Hoe je het gesprek voert — stel deze vragen één voor één, in deze volgorde:
-1. Begin met een korte warme begroeting en vraag direct: op welk moment van de dag wil je het liefst mediteren — ochtend, middag of avond?
-2. Reageer kort op hun antwoord en vraag dan: hoeveel minuten kun je daar dagelijks voor vrijmaken?
-3. Reageer kort en vraag: wat brengt je naar meditatie — wat hoop je te vinden of te oefenen?
-4. Reageer op hun motivatie en leg het programma kort uit (2-3 zinnen). Noem het tijdstip dat ze noemden, koppel de 5-20 minuten opbouw aan hun beschikbare tijd, en sluit aan op hun motivatie. Vraag daarna of ze willen starten.
+Stel deze vragen één voor één, in deze volgorde:
+1. Begin met een warme begroeting en vraag: op welk moment van de dag wil je het liefst mediteren?
+2. Vraag: hoeveel minuten kun je daar dagelijks voor vrijmaken?
+3. Vraag: wat brengt je naar meditatie?
+4. Leg het programma voor — gebruik LETTERLIJK hun antwoorden. Noem hun tijdstip, hun beschikbare tijd, hun reden. Stel je toon af op hun motivatie. Vraag daarna: wil je vandaag beginnen, morgen, of liever op een vaste dag zoals maandag?
 
-Wanneer de gebruiker bevestigt dat ze willen starten (ja, graag, prima, doe maar, etc.):
-- Eindig je bericht met de exacte tekst: [PROGRAMMA_START]
-- Geef daarvoor een korte, persoonlijke afsluiting die aansluit op wat ze deelden
+Wanneer de gebruiker aangeeft wanneer ze willen starten:
+- Bereken de exacte startdatum op basis van hun antwoord (vandaag = ${vandaag}, morgen = de dag erna, maandag = de eerstvolgende maandag, etc.)
+- Geef een korte persoonlijke afsluiting die aansluit op hun antwoorden
+- Eindig je bericht ALTIJD met exact: [PROGRAMMA_START:YYYY-MM-DD] waarbij YYYY-MM-DD de berekende startdatum is
 
 Stijl:
 - Warm, kort, menselijk — geen jargon
@@ -200,10 +204,12 @@ Stijl:
     });
 
     const tekst = response.content[0].text;
-    const programmaBevestigd = tekst.includes('[PROGRAMMA_START]');
-    const schooneTekst = tekst.replace('[PROGRAMMA_START]', '').trim();
+    const startMatch = tekst.match(/\[PROGRAMMA_START:(\d{4}-\d{2}-\d{2})\]/);
+    const programmaBevestigd = !!startMatch;
+    const startDatum = startMatch ? startMatch[1] : null;
+    const schooneTekst = tekst.replace(/\[PROGRAMMA_START:[^\]]*\]/, '').trim();
 
-    res.json({ bericht: schooneTekst, programma_bevestigd: programmaBevestigd });
+    res.json({ bericht: schooneTekst, programma_bevestigd: programmaBevestigd, start_datum: startDatum });
   } catch (err) {
     console.error(err);
     res.status(500).json({ fout: 'Er ging iets mis.' });
