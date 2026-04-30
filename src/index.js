@@ -62,7 +62,7 @@ Geef ALLEEN een JSON terug, geen extra tekst, geen markdown, geen backticks:
 });
 
 app.post('/inquiry', async (req, res) => {
-  const { berichten, tijd, type } = req.body;
+  const { berichten, tijd, type, gestopt = false, gedaanMinuten } = req.body;
 
   const systeem = `Je bent een warme, menselijke mindfulness-coach die na een meditatie met iemand in gesprek gaat. De toon is die van een goede vriend met ervaring — niet klinisch, niet zweverig, gewoon aanwezig.
 
@@ -89,8 +89,17 @@ Stijl:
 - Geen overdreven complimenten of geforceerde positiviteit`;
 
   try {
+    let startBericht;
+    if (berichten.length === 0) {
+      if (gestopt) {
+        const gedaan = gedaanMinuten > 0 ? `${gedaanMinuten} van de ${tijd} minuten` : 'minder dan een minuut';
+        startBericht = `De gebruiker had een ${tijd} minuten ${type} meditatie gestart maar stopte na ${gedaan}. Begin het gesprek — erken dat stoppen ook oké is, vraag hoe het was zonder oordeel. Eén korte vraag.`;
+      } else {
+        startBericht = `De gebruiker heeft zojuist een ${tijd} minuten ${type} meditatie gedaan. Start de inquiry.`;
+      }
+    }
     const messages = berichten.length === 0
-      ? [{ role: 'user', content: `De gebruiker heeft zojuist een ${tijd} minuten ${type} meditatie gedaan. Start de inquiry.` }]
+      ? [{ role: 'user', content: startBericht }]
       : berichten;
 
     const response = await client.messages.create({
