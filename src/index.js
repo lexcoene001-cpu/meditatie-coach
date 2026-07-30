@@ -13,56 +13,15 @@ app.get('/', (req, res) => {
   res.json({ status: 'Coach is online!' });
 });
 
-app.post('/check-in', async (req, res) => {
-  // `streak` is 30 juli 2026 uit het contract gehaald: de app kent geen streaks
-  // meer. Een oude client die het veld nog meestuurt, wordt niet gebroken — het
-  // wordt simpelweg genegeerd.
-  const { naam, stemming, tijd } = req.body;
-
-  if (!naam || !stemming) {
-    return res.status(400).json({ fout: 'naam en stemming zijn verplicht' });
-  }
-
-  const SYSTEEM_PROMPT = `Je bent een warme, rustige mindfulness-coach in een meditatie-app.
-Je werkt met mensen die al een cursus hebben gedaan en helpt hen hun dagelijkse praktijk levend te houden.
-
-Jouw stijl:
-- Kort en menselijk. Maximaal 3 zinnen.
-- Erken eerst hoe iemand zich voelt, stel dan pas iets voor.
-- Nooit pusherig of overdreven positief.
-
-Beschikbare sessies:
-- "adem_3min"      → Ademfocus, 3 minuten
-- "bodyscan_10min" → Body scan, 10 minuten
-- "open_10min"     → Open aandacht, 10 minuten
-- "metta_10min"    → Liefdevolle vriendelijkheid, 10 minuten
-
-Geef ALLEEN een JSON terug, geen extra tekst, geen markdown, geen backticks:
-{
-  "bericht": "...",
-  "sessie_id": "...",
-  "reden": "..."
-}`;
-
-  try {
-    const response = await client.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 1024,
-      system: SYSTEEM_PROMPT,
-      messages: [{ role: 'user', content: `Naam: ${naam}\nStemming: "${stemming}"\nTijd: ${tijd} minuten` }],
-    });
-
-    const tekst = response.content[0].text
-      .replace(/```json\n?/g, '')
-      .replace(/```\n?/g, '')
-      .trim();
-
-    res.json(JSON.parse(tekst));
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ fout: 'Coach kon geen reactie genereren' });
-  }
-});
+// Hier stond POST /check-in, verwijderd 30 juli 2026. Het werd door geen enkele
+// client aangeroepen (de app gebruikt /inquiry, /coach en /programma) en stamde
+// nog uit april: de sessie-ID's in de prompt — "bodyscan_10min", "metta_10min",
+// "open_10min" — bestaan in de huidige app niet meer.
+//
+// Reden om het echt te verwijderen en niet te laten staan: het endpoint riep de
+// Anthropic-API aan zonder enige authenticatie, dus wie de URL kende kon er
+// API-tegoed door verstoken. Dat geldt nog steeds voor de endpoints die wél in
+// gebruik zijn; dat is een apart openstaand punt.
 
 app.post('/inquiry', async (req, res) => {
   const { berichten = [], tijd, type, gestopt = false, gedaanMinuten, programmaDag, programmaFase } = req.body;
@@ -300,7 +259,7 @@ app.get('/privacy', (req, res) => {
   </ul>
 
   <h2>4. Hoe lang bewaren we je gegevens</h2>
-  <p>Je gegevens worden bewaard zolang je account actief is. Je kunt op elk moment je account en alle bijbehorende gegevens laten verwijderen via <a href="mailto:verlichting2010@gmail.com">verlichting2010@gmail.com</a>.</p>
+  <p>Je gegevens worden bewaard zolang je account actief is. Je kunt je account op elk moment zelf verwijderen in de app: tik op het tandwiel rechtsboven op het hoofdscherm en kies <strong>Account verwijderen</strong>. Na een tweede bevestiging worden je account en alle bijbehorende gegevens verwijderd; dat kan niet worden teruggedraaid. Lukt dat niet, dan kun je het ook aanvragen via <a href="mailto:lexcoene001@gmail.com">lexcoene001@gmail.com</a>.</p>
 
   <h2>5. Delen met derden</h2>
   <p>We delen je gegevens niet met derden, behalve:</p>
@@ -313,7 +272,7 @@ app.get('/privacy', (req, res) => {
   <p>De coach in ZIT is een AI, aangedreven door Claude van Anthropic. De coach is geen vervanging voor professionele psychologische of medische hulp. Berichten die je naar de coach stuurt worden verwerkt door de Anthropic API en niet door ons opgeslagen.</p>
 
   <h2>7. Jouw rechten</h2>
-  <p>Op grond van de AVG heb je het recht op inzage, correctie en verwijdering van je gegevens. Stuur een e-mail naar <a href="mailto:verlichting2010@gmail.com">verlichting2010@gmail.com</a> en we reageren binnen 30 dagen.</p>
+  <p>Op grond van de AVG heb je het recht op inzage, correctie en verwijdering van je gegevens. Stuur een e-mail naar <a href="mailto:lexcoene001@gmail.com">lexcoene001@gmail.com</a> en we reageren binnen 30 dagen.</p>
 
   <h2>8. Beveiliging</h2>
   <p>Je gegevens worden opgeslagen bij Supabase met versleutelde verbindingen (HTTPS) en row-level security. Alleen jij hebt toegang tot jouw gegevens.</p>
@@ -322,7 +281,7 @@ app.get('/privacy', (req, res) => {
   <p>We kunnen deze privacyverklaring aanpassen. Bij belangrijke wijzigingen word je via de app geïnformeerd.</p>
 
   <h2>10. Contact</h2>
-  <p>Vragen? Mail naar <a href="mailto:verlichting2010@gmail.com">verlichting2010@gmail.com</a>.</p>
+  <p>Vragen? Mail naar <a href="mailto:lexcoene001@gmail.com">lexcoene001@gmail.com</a>.</p>
 </body>
 </html>`);
 });
