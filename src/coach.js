@@ -26,7 +26,6 @@ Geef ALLEEN een JSON terug, geen extra tekst, geen markdown, geen backticks:
 async function genereerCoachReactie(gebruiker) {
   const gebruikersContext = `
 Naam: ${gebruiker.naam}
-Streak: ${gebruiker.streak} dagen
 Stemming vandaag: "${gebruiker.stemming}"
 Beschikbare tijd: ${gebruiker.tijd} minuten
 `;

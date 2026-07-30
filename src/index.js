@@ -14,7 +14,10 @@ app.get('/', (req, res) => {
 });
 
 app.post('/check-in', async (req, res) => {
-  const { naam, streak, stemming, tijd } = req.body;
+  // `streak` is 30 juli 2026 uit het contract gehaald: de app kent geen streaks
+  // meer. Een oude client die het veld nog meestuurt, wordt niet gebroken — het
+  // wordt simpelweg genegeerd.
+  const { naam, stemming, tijd } = req.body;
 
   if (!naam || !stemming) {
     return res.status(400).json({ fout: 'naam en stemming zijn verplicht' });
@@ -46,7 +49,7 @@ Geef ALLEEN een JSON terug, geen extra tekst, geen markdown, geen backticks:
       model: 'claude-sonnet-4-6',
       max_tokens: 1024,
       system: SYSTEEM_PROMPT,
-      messages: [{ role: 'user', content: `Naam: ${naam}\nStreak: ${streak} dagen\nStemming: "${stemming}"\nTijd: ${tijd} minuten` }],
+      messages: [{ role: 'user', content: `Naam: ${naam}\nStemming: "${stemming}"\nTijd: ${tijd} minuten` }],
     });
 
     const tekst = response.content[0].text
@@ -139,7 +142,9 @@ app.post('/coach', async (req, res) => {
   let contextTekst = '';
   if (context && Object.keys(context).length > 0) {
     const regels = [];
-    if (context.streak > 0) regels.push(`Streak: ${context.streak} dagen op rij`);
+    // Geen streak-regel meer (30 juli 2026): de app toont geen dagen-op-rij, dus
+    // de coach hoort er ook niet over te kunnen praten. Zou een oude client het
+    // veld nog meesturen, dan wordt het hier niet meer gelezen.
     if (context.totaalSessies > 0) regels.push(`Totaal meditaties: ${context.totaalSessies} (${context.totaalMinuten} minuten)`);
     if (context.meestGedaan) regels.push(`Meest beoefend: ${context.meestGedaan}`);
     if (context.heeftProgramma) {
@@ -290,7 +295,7 @@ app.get('/privacy', (req, res) => {
   <h2>3. Waarom verzamelen we deze gegevens</h2>
   <ul>
     <li>Om je te kunnen laten inloggen en je voortgang bij te houden.</li>
-    <li>Om je streak, sessiegeschiedenis en programmavoortgang te tonen.</li>
+    <li>Om je sessiegeschiedenis en programmavoortgang te tonen.</li>
     <li>Om de app te verbeteren op basis van feedback.</li>
   </ul>
 
